@@ -1,0 +1,16 @@
+{
+  "name": "skypebotww",
+  "version": "1.0.0",
+  "description": "A skype bot service for webward",
+  "main": "index.js",
+  "dependencies": {
+    "botbuilder": "^3.15.0",
+    "restify": "^7.2.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
