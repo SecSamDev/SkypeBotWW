@@ -70,6 +70,7 @@ bot.dialog('/', function (session, args) {
 server.post('/webward/messages', (req, res) => {
     console.log(req.body)
     console.log(process.env.MicrosoftAppId)
+    console.log(process.env.MicrosoftAppPassword)
     if (req.body
         && typeof req.body.address === 'string'
         && typeof req.body.message === 'string') {
