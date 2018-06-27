@@ -1,26 +1,29 @@
 
-var restify = require('restify');
+var express = require('express');
+const http = require('http')
+var app = express();
 var builder = require('botbuilder');
-var logger  = require('morgan')
-
+var logger = require('morgan')
+var bodyParser = require('body-parser');
 const crypto = require('crypto'),
     algorithm = 'aes-256-ctr',
     password = process.env.WW_ENCRYPT || 'd6F3Efeq';
 
 var inMemoryStorage = new builder.MemoryBotStorage();
 
-// Setup Restify Server
-var server = restify.createServer();
-server.listen(process.env.PORT || process.env.BOT_PORT || 80, function () {
-    console.log('%s listening to %s', server.name, server.url);
-});
-server.use(logger('dev'));
+const port = normalizePort(process.env.PORT || '80');
 
 
 
-server.get('/',(req,res,next)=>{
+app.use(bodyParser.json({ type: 'application/json', limit: '100kb' }));
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(logger('dev'));
+
+
+
+app.get('/', (req, res, next) => {
     res.send('hello webward');
-    next();
 })
 // Create chat connector for communicating with the Bot Framework Service
 var connector = new builder.ChatConnector({
@@ -29,16 +32,14 @@ var connector = new builder.ChatConnector({
 });
 
 // Listen for messages from users 
-server.post('/api/messages', (req,res)=>{
+app.post('/api/messages', (req, res) => {
     console.log(req.body);
-    (connector.listen())(req,res);
+    (connector.listen())(req, res);
 });
 
-server.use(restify.plugins.bodyParser())
-server.use(restify.plugins.jsonBodyParser())
 // Receive messages from the user and respond by echoing each message back (prefixed with 'You said:')
 var bot = new builder.UniversalBot(connector).set('storage', inMemoryStorage);
-bot.on('error',(data)=>{
+bot.on('error', (data) => {
     console.log("Bot Error")
     console.log(data)
 })
@@ -75,7 +76,7 @@ bot.dialog('/', function (session, args) {
 })
 
 //Local sending messages
-server.post('/webward/messages', (req, res) => {
+app.post('/webward/messages', (req, res) => {
     console.log(req.body)
     console.log(process.env.MicrosoftAppId)
     console.log(process.env.MicrosoftAppPassword)
@@ -86,7 +87,7 @@ server.post('/webward/messages', (req, res) => {
             sendProactiveMessage(obtainAddress(req.body.address), req.body.message)
             res.send({ "status": "ok" })
         } catch (err) {
-            res.send({ "status": "error","error" : err })
+            res.send({ "status": "error", "error": err })
         }
 
     } else {
@@ -100,30 +101,30 @@ function encrypt(text) {
     return crypted;
 }
 function obtainAddress(addEncrypted) {
-    try{
+    try {
         var addDecrypted = decrypt(addEncrypted);
         var addParsed = JSON.parse(addDecrypted);
         if (typeof addParsed.id === 'string'
             && typeof addParsed.id === 'string'
             && addParsed.user
-                && typeof addParsed.user.id === 'string'
-                && typeof addParsed.user.name === 'string'
-            && addParsed.conversation 
-                && typeof addParsed.user.id === 'string'
+            && typeof addParsed.user.id === 'string'
+            && typeof addParsed.user.name === 'string'
+            && addParsed.conversation
+            && typeof addParsed.user.id === 'string'
             && addParsed.bot
-                && typeof addParsed.bot.id === 'string'
-                && typeof addParsed.bot.name === 'string'
-                && typeof addParsed.bot.role === 'string'
+            && typeof addParsed.bot.id === 'string'
+            && typeof addParsed.bot.name === 'string'
+            && typeof addParsed.bot.role === 'string'
             && typeof addParsed.serviceUrl === 'string'
         ) {
             return addParsed;
-        }else{
+        } else {
             throw (new Error("Not valid"))
         }
-    }catch(err){
+    } catch (err) {
         throw err;
     }
-    
+
 }
 
 function decrypt(text) {
@@ -131,4 +132,36 @@ function decrypt(text) {
     var dec = decipher.update(text, 'hex', 'utf8')
     dec += decipher.final('utf8');
     return dec;
+}
+
+// catch 404 and forward to error handler
+app.use(function (req, res, next) {
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
+});
+
+// error handler
+app.use(function (err, req, res, next) {
+    res.status(err.status || 500);
+    res.send(err);
+});
+app.set('port', port);
+var server = http.createServer(app);
+server.listen(port);
+
+function normalizePort(val) {
+    var port = parseInt(val, 10);
+
+    if (isNaN(port)) {
+        // named pipe
+        return val;
+    }
+
+    if (port >= 0) {
+        // port number
+        return port;
+    }
+
+    return false;
 }
