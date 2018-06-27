@@ -1,6 +1,7 @@
 
 var restify = require('restify');
 var builder = require('botbuilder');
+var logger  = require('morgan')
 
 const crypto = require('crypto'),
     algorithm = 'aes-256-ctr',
@@ -13,6 +14,7 @@ var server = restify.createServer();
 server.listen(process.env.PORT || process.env.BOT_PORT || 80, function () {
     console.log('%s listening to %s', server.name, server.url);
 });
+server.use(logger('dev'));
 server.use(restify.plugins.bodyParser())
 server.use(restify.plugins.jsonBodyParser())
 
