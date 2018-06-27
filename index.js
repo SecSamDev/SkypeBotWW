@@ -1,10 +1,13 @@
 
 var restify = require('restify');
 var builder = require('botbuilder');
+
 const crypto = require('crypto'),
     algorithm = 'aes-256-ctr',
     password = process.env.WW_ENCRYPT || 'd6F3Efeq';
+    
 var inMemoryStorage = new builder.MemoryBotStorage();
+
 // Setup Restify Server
 var server = restify.createServer();
 server.listen(process.env.PORT || process.env.BOT_PORT || 80, function () {
