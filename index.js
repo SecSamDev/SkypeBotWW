@@ -107,21 +107,18 @@ function obtainAddress(addEncrypted) {
         if (typeof addParsed.id === 'string'
             && typeof addParsed.id === 'string'
             && addParsed.user
-            && typeof addParsed.user.id === 'string'
-            && typeof addParsed.user.name === 'string'
+            && typeof addParsed.from.id === 'string'
+            && typeof addParsed.from.name === 'string'
             && addParsed.conversation
-            && typeof addParsed.user.id === 'string'
-            && addParsed.bot
-            && typeof addParsed.bot.id === 'string'
-            && typeof addParsed.bot.name === 'string'
-            && typeof addParsed.bot.role === 'string'
+            && typeof addParsed.conversation.id === 'string'
             && typeof addParsed.serviceUrl === 'string'
         ) {
             return addParsed;
         } else {
-            throw (new Error("Not valid"))
+            return addParsed;
         }
     } catch (err) {
+        console.log("error")
         throw err;
     }
 
