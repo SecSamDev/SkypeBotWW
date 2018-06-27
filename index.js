@@ -10,13 +10,10 @@ var server = restify.createServer();
 server.listen(process.env.bot_port || process.env.BOT_PORT || 80, function () {
     console.log('%s listening to %s', server.name, server.url);
 });
+server.use(restify.plugins.bodyParser())
+server.use(restify.plugins.jsonBodyParser())
 
 
-// Create chat connector for communicating with the Bot Framework Service
-var connector = new builder.ChatConnector({
-    appId: process.env.MicrosoftAppId,
-    appPassword: process.env.MicrosoftAppPassword
-});
 server.get('/',(req,res,next)=>{
     res.send('hello webward');
     next();
@@ -24,6 +21,11 @@ server.get('/',(req,res,next)=>{
 // Listen for messages from users 
 server.post('/api/messages', connector.listen());
 
+// Create chat connector for communicating with the Bot Framework Service
+var connector = new builder.ChatConnector({
+    appId: process.env.MicrosoftAppId,
+    appPassword: process.env.MicrosoftAppPassword
+});
 // Receive messages from the user and respond by echoing each message back (prefixed with 'You said:')
 var bot = new builder.UniversalBot(connector).set('storage', inMemoryStorage);
 
@@ -57,8 +59,7 @@ bot.dialog('/', function (session, args) {
     //Muted bot
     //session.send("You said: %s", session.message.text);
 })
-server.use(restify.plugins.bodyParser())
-server.use(restify.plugins.jsonBodyParser())
+
 //Local sending messages
 server.post('/webward/messages', (req, res) => {
     if (req.body
