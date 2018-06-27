@@ -8,7 +8,8 @@ var bodyParser = require('body-parser');
 const crypto = require('crypto'),
     algorithm = 'aes-256-ctr',
     password = process.env.WW_ENCRYPT || 'd6F3Efeq';
-
+const fs = require('fs')
+const path = require('path')
 var inMemoryStorage = new builder.MemoryBotStorage();
 
 const port = normalizePort(process.env.PORT || '80');
@@ -18,9 +19,11 @@ const port = normalizePort(process.env.PORT || '80');
 app.use(bodyParser.json({ type: 'application/json', limit: '100kb' }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(logger('dev'));
+// create a write stream (in append mode)
+var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), {flags: 'a'})
 
-
+// setup the logger
+app.use(logger('combined', {stream: accessLogStream}))
 
 app.get('/', (req, res, next) => {
     res.send('hello webward');
@@ -87,11 +90,11 @@ app.post('/webward/messages', (req, res) => {
             sendProactiveMessage(obtainAddress(req.body.address), req.body.message)
             res.send({ "status": "ok" })
         } catch (err) {
-            res.send({ "status": "error", "error": err })
+            res.status(500).send({ "status": "error", "error": err })
         }
 
     } else {
-        res.send({ "error": "No body" })
+        res.status(500).send({ "error": "No body" })
     }
 });
 function encrypt(text) {
@@ -101,24 +104,20 @@ function encrypt(text) {
     return crypted;
 }
 function obtainAddress(addEncrypted) {
+    var addDecrypted;
     try {
-        var addDecrypted = decrypt(addEncrypted);
-        var addParsed = JSON.parse(addDecrypted);
-        if (typeof addParsed.id === 'string'
-            && typeof addParsed.id === 'string'
-            && addParsed.user
-            && typeof addParsed.from.id === 'string'
-            && typeof addParsed.from.name === 'string'
-            && addParsed.conversation
-            && typeof addParsed.conversation.id === 'string'
-            && typeof addParsed.serviceUrl === 'string'
-        ) {
-            return addParsed;
-        } else {
-            return addParsed;
-        }
+        addDecrypted = decrypt(addEncrypted);
     } catch (err) {
-        console.log("error")
+        console.log("error decrypt")
+        onsole.log(err)
+        throw err;
+    }
+    try {
+        var addParsed = JSON.parse(addDecrypted);
+        return addParsed;
+    } catch (err) {
+        console.log("error parse")
+        console.log(err)
         throw err;
     }
 
