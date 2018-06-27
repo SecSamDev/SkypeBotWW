@@ -7,7 +7,7 @@ const crypto = require('crypto'),
 var inMemoryStorage = new builder.MemoryBotStorage();
 // Setup Restify Server
 var server = restify.createServer();
-server.listen(process.env.bot_port || process.env.BOT_PORT || 3978, function () {
+server.listen(process.env.bot_port || process.env.BOT_PORT || 80, function () {
     console.log('%s listening to %s', server.name, server.url);
 });
 
