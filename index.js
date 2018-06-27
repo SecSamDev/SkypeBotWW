@@ -17,7 +17,10 @@ var connector = new builder.ChatConnector({
     appId: process.env.MicrosoftAppId,
     appPassword: process.env.MicrosoftAppPassword
 });
-
+server.get('/',(req,res,next)=>{
+    res.send('hello webward');
+    next();
+})
 // Listen for messages from users 
 server.post('/api/messages', connector.listen());
 
