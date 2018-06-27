@@ -28,13 +28,20 @@ var connector = new builder.ChatConnector({
     appId: process.env.MicrosoftAppId,
     appPassword: process.env.MicrosoftAppPassword
 });
+
 // Listen for messages from users 
-server.post('/api/messages', connector.listen());
+server.post('/api/messages', (req,res)=>{
+    console.log(req.body);
+    (connector.listen())(req,res);
+});
 
 
 // Receive messages from the user and respond by echoing each message back (prefixed with 'You said:')
 var bot = new builder.UniversalBot(connector).set('storage', inMemoryStorage);
-
+bot.on('error',(data)=>{
+    console.log("Bot Error")
+    console.log(data)
+})
 function sendProactiveMessage(address, message) {
     var msg = new builder.Message().address(address);
     msg.text(message);
