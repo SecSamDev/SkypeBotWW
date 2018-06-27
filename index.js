@@ -15,8 +15,7 @@ server.listen(process.env.PORT || process.env.BOT_PORT || 80, function () {
     console.log('%s listening to %s', server.name, server.url);
 });
 server.use(logger('dev'));
-server.use(restify.plugins.bodyParser())
-server.use(restify.plugins.jsonBodyParser())
+
 
 
 server.get('/',(req,res,next)=>{
@@ -35,13 +34,15 @@ server.post('/api/messages', (req,res)=>{
     (connector.listen())(req,res);
 });
 
-
+server.use(restify.plugins.bodyParser())
+server.use(restify.plugins.jsonBodyParser())
 // Receive messages from the user and respond by echoing each message back (prefixed with 'You said:')
 var bot = new builder.UniversalBot(connector).set('storage', inMemoryStorage);
 bot.on('error',(data)=>{
     console.log("Bot Error")
     console.log(data)
 })
+
 function sendProactiveMessage(address, message) {
     var msg = new builder.Message().address(address);
     msg.text(message);
