@@ -67,6 +67,7 @@ bot.dialog('/', function (session, args) {
 //Local sending messages
 server.post('/webward/messages', (req, res) => {
     console.log(req.body)
+    console.log(process.env.MicrosoftAppId)
     if (req.body
         && typeof req.body.address === 'string'
         && typeof req.body.message === 'string') {
