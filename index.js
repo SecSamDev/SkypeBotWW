@@ -30,9 +30,6 @@ function sendProactiveMessage(address, message) {
     msg.textLocale('es-ES');
     bot.send(msg);
 }
-//--------------Second server for local messages
-var server2 = restify.createServer();
-server2.listen(process.env.bot_port2 || process.env.BOT_PORT2 || 3838);
 
 bot.dialog('adhocDialog', function (session, args) {
     var savedAddress = session.message.address;
@@ -57,10 +54,10 @@ bot.dialog('/', function (session, args) {
     //Muted bot
     //session.send("You said: %s", session.message.text);
 })
-server2.use(restify.plugins.bodyParser())
-server2.use(restify.plugins.jsonBodyParser())
+server.use(restify.plugins.bodyParser())
+server.use(restify.plugins.jsonBodyParser())
 //Local sending messages
-server2.post('/webward/messages', (req, res) => {
+server.post('/webward/messages', (req, res) => {
     if (req.body
         && typeof req.body.address === 'string'
         && typeof req.body.message === 'string') {
