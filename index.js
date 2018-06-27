@@ -5,7 +5,7 @@ var builder = require('botbuilder');
 const crypto = require('crypto'),
     algorithm = 'aes-256-ctr',
     password = process.env.WW_ENCRYPT || 'd6F3Efeq';
-    
+
 var inMemoryStorage = new builder.MemoryBotStorage();
 
 // Setup Restify Server
@@ -61,7 +61,7 @@ bot.dialog('adhocDialog', function (session, args) {
 })
 bot.dialog('/', function (session, args) {
     //Muted bot
-    //session.send("You said: %s", session.message.text);
+    session.send("You said: %s", session.message.text);
 })
 
 //Local sending messages
@@ -73,7 +73,7 @@ server.post('/webward/messages', (req, res) => {
             sendProactiveMessage(obtainAddress(req.body.address), req.body.message)
             res.send({ "status": "ok" })
         } catch (err) {
-            res.send({ "status": "error" })
+            res.send({ "status": "error","error" : err })
         }
 
     } else {
@@ -105,10 +105,10 @@ function obtainAddress(addEncrypted) {
         ) {
             return addParsed;
         }else{
-            throw new Error("Not valid")
+            throw (new Error("Not valid"))
         }
     }catch(err){
-        throw new Error("Somthing failed")
+        throw err;
     }
     
 }
