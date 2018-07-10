@@ -14,7 +14,7 @@ var inMemoryStorage = new builder.MemoryBotStorage();
 
 const port = normalizePort(process.env.PORT || '80');
 
-
+const { Console } = require('console')
 
 app.use(bodyParser.json({ type: 'application/json', limit: '100kb' }));
 app.use(bodyParser.urlencoded({ extended: true }));
