@@ -21,7 +21,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // create a write stream (in append mode)
 var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), {flags: 'a'})
-
+var pipeConsole = new Console(
+    fs.createWriteStream('./SkypeStOut.log'),
+    fs.createWriteStream('./SkypeStErr.log')
+);
+console = pipeConsole;
 // setup the logger
 app.use(logger('combined', {stream: accessLogStream}))
 
